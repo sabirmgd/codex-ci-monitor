@@ -104,6 +104,12 @@ class MonitorTest(unittest.TestCase):
         self.assertFalse(monitor.HEAD_RE.fullmatch("abc1234"))
         self.assertFalse(monitor.HEAD_RE.fullmatch("A" * 40))
 
+    def test_queue_event_id_is_protocol_versioned(self):
+        result = monitor.terminal("https://github.com/o/r/actions/runs/7", "abc", "success")
+        legacy_payload = json.dumps({"session_id": "session-1", "result": result}, sort_keys=True, separators=(",", ":"))
+        legacy = monitor.hashlib.sha256(legacy_payload.encode()).hexdigest()[:24]
+        self.assertNotEqual(monitor.event_id("session-1", result), legacy)
+
     @patch.object(monitor.subprocess, "run", side_effect=FileNotFoundError)
     def test_missing_provider_binary_is_clean_error(self, _run):
         with self.assertRaisesRegex(RuntimeError, "provider command unavailable"):
@@ -136,6 +142,7 @@ class MonitorTest(unittest.TestCase):
             self.assertEqual(command[:5], ["/usr/bin/codex", "queue", "--thread", "session-1", "--message"])
             self.assertEqual(stat.S_IMODE(receipt.stat().st_mode), 0o600)
             receipt_data = json.loads(receipt.read_text())
+            self.assertEqual(receipt_data["delivery_protocol"], "codex-queue-v1")
             self.assertEqual(receipt_data["queue_message_id"], "11111111-1111-1111-1111-111111111111")
 
     @patch.object(monitor, "process_alive", return_value=False)

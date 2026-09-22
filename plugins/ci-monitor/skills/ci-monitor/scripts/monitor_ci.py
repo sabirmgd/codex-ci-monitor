@@ -21,6 +21,7 @@ GOOD = {"success", "neutral", "skipped", "pass", "skipping"}
 BAD = {"failure", "failed", "cancelled", "canceled", "timed_out", "action_required", "startup_failure", "fail", "cancel", "manual"}
 SESSION_RE = re.compile(r"^[A-Za-z0-9._:-]+$")
 HEAD_RE = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
+DELIVERY_PROTOCOL = "codex-queue-v1"
 
 
 def run_json(command: list[str]) -> tuple[int, object, str]:
@@ -203,7 +204,11 @@ def check(target: str, expected_head: str) -> dict[str, object]:
 
 
 def event_id(session_id: str, result: dict[str, object]) -> str:
-    payload = json.dumps({"session_id": session_id, "result": result}, sort_keys=True, separators=(",", ":"))
+    payload = json.dumps(
+        {"delivery_protocol": DELIVERY_PROTOCOL, "session_id": session_id, "result": result},
+        sort_keys=True,
+        separators=(",", ":"),
+    )
     return hashlib.sha256(payload.encode()).hexdigest()[:24]
 
 
@@ -316,7 +321,17 @@ def queue_codex(session_id: str, result: dict[str, object], next_action: str, ca
             atomic_json(failure, {"delivered": False, "event_id": identifier, "failed_at": time.time()})
             alert_delivery_failure(identifier, failure)
             raise RuntimeError(f"Codex session queue failed after 3 attempts; receipt: {failure}")
-        atomic_json(receipt, {"delivered": True, "event_id": identifier, "queue_message_id": queued_message_id, "result": result, "delivered_at": time.time()})
+        atomic_json(
+            receipt,
+            {
+                "delivered": True,
+                "delivery_protocol": DELIVERY_PROTOCOL,
+                "event_id": identifier,
+                "queue_message_id": queued_message_id,
+                "result": result,
+                "delivered_at": time.time(),
+            },
+        )
         return True, receipt
     finally:
         lock.unlink(missing_ok=True)

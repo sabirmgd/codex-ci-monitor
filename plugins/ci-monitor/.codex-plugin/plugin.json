@@ -1,6 +1,6 @@
 {
   "name": "ci-monitor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Token-efficient exact-head CI monitoring with native same-session continuation.",
   "author": {
     "name": "Sabir Salah"
