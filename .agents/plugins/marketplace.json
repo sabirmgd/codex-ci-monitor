@@ -1,0 +1,20 @@
+{
+  "name": "codex-ci-monitor",
+  "interface": {
+    "displayName": "Codex CI Monitor"
+  },
+  "plugins": [
+    {
+      "name": "ci-monitor",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ci-monitor"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

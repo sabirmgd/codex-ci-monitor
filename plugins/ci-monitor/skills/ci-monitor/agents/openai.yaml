@@ -1,0 +1,4 @@
+interface:
+  display_name: "CI Monitor"
+  short_description: "Wait token-free, then queue this thread"
+  default_prompt: "Monitor this exact CI run without model polling, queue one terminal message to this same Codex session, and continue the pending workflow."

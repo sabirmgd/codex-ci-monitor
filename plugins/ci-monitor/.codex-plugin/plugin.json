@@ -1,0 +1,18 @@
+{
+  "name": "ci-monitor",
+  "version": "1.0.0",
+  "description": "Token-efficient exact-head CI monitoring with native same-session continuation.",
+  "author": {
+    "name": "Sabir Salah"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "CI Monitor",
+    "shortDescription": "Wait token-free, then queue the same Codex session.",
+    "longDescription": "Monitors one exact GitHub or GitLab CI target without model polling, validates the expected commit, and queues one terminal continuation to the originating Codex session.",
+    "developerName": "Sabir Salah",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Monitor this exact CI run without model polling, then continue this same Codex session when it reaches a terminal state."
+  }
+}
